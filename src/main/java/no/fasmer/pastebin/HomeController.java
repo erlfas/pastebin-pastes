@@ -2,6 +2,7 @@ package no.fasmer.pastebin;
 
 import java.util.List;
 import no.fasmer.pastebin.pastes.Comment;
+import no.fasmer.pastebin.pastes.CommentGetter;
 import no.fasmer.pastebin.pastes.Paste;
 import no.fasmer.pastebin.pastes.PasteService;
 import no.fasmer.pastebin.pastes.PasteWithComment;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
 
 @Controller
@@ -23,11 +23,11 @@ public class HomeController {
     private static final String ID = "{id:.+}";
 
     private final PasteService pasteService;
-    private final RestTemplate restTemplate;
+    private final CommentGetter commentHelper; 
 
-    public HomeController(PasteService pasteService, RestTemplate restTemplate) {
+    public HomeController(PasteService pasteService, CommentGetter commentHelper) {
         this.pasteService = pasteService;
-        this.restTemplate = restTemplate;
+        this.commentHelper = commentHelper;
     }
 
     @GetMapping("/")
@@ -45,13 +45,7 @@ public class HomeController {
     @GetMapping(value = BASE_PATH + "/" + ID)
     public Mono<String> onePaste(@PathVariable String id, Model model) {
         final Mono<PasteWithComment> result = pasteService.findOnePaste(id)
-                .flatMap(paste -> Mono.just(paste).zipWith(
-                        Mono.just(restTemplate.exchange(
-                                "http://PASTEBINCOMMENTS/comments/{pasteId}", 
-                                HttpMethod.GET, 
-                                null, 
-                                new ParameterizedTypeReference<List<Comment>>() {}, paste.getId())
-                                .getBody())))
+                .flatMap(paste -> Mono.just(paste).zipWith(Mono.just(commentHelper.getComments(paste))))
                 .map(x -> {
                     final PasteWithComment pasteWithComment = new PasteWithComment();
                     pasteWithComment.setId(x.getT1().getId());
