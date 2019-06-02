@@ -1,4 +1,4 @@
-package no.fasmer.pastebin.pastes;
+package no.fasmer.pastebin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
