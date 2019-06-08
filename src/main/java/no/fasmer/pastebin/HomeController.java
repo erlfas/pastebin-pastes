@@ -1,13 +1,9 @@
 package no.fasmer.pastebin;
 
-import java.util.List;
-import no.fasmer.pastebin.pastes.Comment;
 import no.fasmer.pastebin.pastes.CommentGetter;
 import no.fasmer.pastebin.pastes.Paste;
 import no.fasmer.pastebin.pastes.PasteService;
 import no.fasmer.pastebin.pastes.PasteWithComment;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
